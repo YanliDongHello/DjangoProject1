@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Registration</title>
+    <!-- Link to Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Link to custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Add custom styles here (if needed) */
+        .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <form method="post" onsubmit="return validateForm()" class="col-md-6">
+            <h1 class="mb-4">Register</h1>
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="text" id="email" name="Email" placeholder="Email" required class="form-control mb-2">
+            </div>
+            <div class="form-group">
+                <label for="username">User Name *</label>
+                <input type="text" id="username" name="User Name" placeholder="Username" required class="form-control mb-2">
+            </div>
+            <div class="form-group">
+                <label for="password">Password *</label>
+                <input type="password" id="password" name="password" placeholder="Password" required class="form-control mb-2">
+                <div id="password-strength" class="mb-2"></div>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password *</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required class="form-control mb-2">
+                <div id="password-match-message" class="text-danger mb-2"></div>
+            </div>
+            <div class="form-group">
+                <label for="first_name">First Name *</label>
+                <input type="text" id="first_name" name="First Name" placeholder="First Name" required class="form-control mb-2">
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name *</label>
+                <input type="text" id="last_name" name="Last Name" placeholder="Last Name" required class="form-control mb-2">
+            </div>
+            <div class="form-group">
+                <label for="country">Country</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <select class="form-control" name="country_code" id="country_code">
+                            {% for code in country_codes %}
+                            <option value="{{ code }}">{{ code }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <input type="tel" id="phone" name="phone" pattern="[0-9]{3}[0-9]{3}[0-9]{4}" required class="form-control">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+
+    <script>
+        function validateForm() {
+            const password = document.getElementById('password').value;
+            const confirm_password = document.getElementById('confirm_password').value;
+            const passwordStrength = document.getElementById('password-strength');
+            const passwordMatchMessage = document.getElementById('password-match-message');
+            const submitBtn = document.querySelector('button[type="submit"]');
+
+            // Check password length (minimum 8 characters).
+            if (password.length < 8) {
+                alert('Password must be at least 8 characters long.');
+                return false;
+            }
+
+            // Check if password contains at least one special character.
+            if (!/[!@#$%^&*()_+{}\[\]:;<>,.?~\-]/.test(password)) {
+                alert('Password must contain at least one special character.');
+                return false;
+            }
+
+            // Check if password and confirm_password match.
+            if (password !== confirm_password) {
+                passwordMatchMessage.textContent = 'Password and confirmation password do not match.';
+                submitBtn.disabled = true; // Disable the submit button
+                return false;
+            } else {
+                passwordMatchMessage.textContent = ''; // Reset error message
+                submitBtn.disabled = false; // Enable the submit button
+            }
+
+            return true; // Form will be submitted if all validations pass.
+        }
+
+        // Update the password strength indicator on password input change.
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const passwordStrength = document.getElementById('password-strength');
+
+            // Reset the password strength indicator.
+            passwordStrength.innerHTML = '';
+
+            // Check for minimum length requirement.
+            if (password.length >= 8) {
+                passwordStrength.innerHTML += '✔️ Minimum 8 characters<br>';
+            }
+
+            // Check for both uppercase and lowercase letters.
+            if (password.toLowerCase() !== password && password.toUpperCase() !== password) {
+                passwordStrength.innerHTML += '✔️ Contains both uppercase and lowercase letters<br>';
+            } else {
+                passwordStrength.innerHTML += '❌ Password must contain both uppercase and lowercase letters<br>';
+            }
+
+            // Check for at least one digit.
+            if (/\d/.test(password)) {
+                passwordStrength.innerHTML += '✔️ Contains at least one digit<br>';
+            } else {
+                passwordStrength.innerHTML += '❌ Missing at least one digit<br>';
+            }
+
+            // Check for at least one special character.
+            if (/[!@#$%^&*()_+{}\[\]:;<>,.?~\-]/.test(password)) {
+                passwordStrength.innerHTML += '✔️ Contains at least one special character<br>';
+            } else {
+                passwordStrength.innerHTML += '❌ Missing at least one special character<br>';
+            }
+        });
+    </script>
